@@ -8,9 +8,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 @ServletComponentScan("in.bloomapp")
 public class FlowerappApiApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(FlowerappApiApplication.class, args);
 	}
-
 }
