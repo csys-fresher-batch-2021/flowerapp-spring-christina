@@ -5,6 +5,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Registration page</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 </head>
 <body>
 <jsp:include page="header.jsp"></jsp:include>
@@ -13,7 +14,7 @@
 		<h3>Registration page</h3>
 		</div>
 		<form onsubmit="register()" method="post">	
-		<label  class="d-flex justify-content-center" id="testLabel" style="color:red"></label>
+		<label  class="d-flex justify-content-center" id="messageLabel" style="color:red"></label>
 		<div class="d-flex justify-content-center">
 		<label for="Name">User Name:</label>
 		</div>
@@ -69,14 +70,16 @@
 			let address=document.querySelector("#Address").value;
 			const queryParameter="?name="+name+"&password="+password+"&email="+email+"&mobileNo="+mobileNo+"&address="+address;
 			let url="RegisterUserServlet"+queryParameter;
-			fetch(url,{ method:'POST'}).then(res => res.json()).then(res=>{
-				if(res.IS_ADDED=="Registration successfull"){
-					alert(res.IS_ADDED);
-					window.location.href="Login.jsp";
+			let data={};
+			axios.post(url,data).then(res=> {
+				let data = res.data;
+				alert(data.infoMessage);
+				window.location.href="Login.jsp";
 				}
-				else{
-					document.getElementById('testLabel').innerHTML = (res.IS_ADDED);
-				}
+			).catch(err=>{
+				let data = err.response.data;
+				document.getElementById('messageLabel').innerHTML = (data.errorMessage);
+				
 			});
 		}
 		</script>		

@@ -1,6 +1,7 @@
 package in.bloomapp.service;
 
 import java.util.List;
+
 import in.bloomapp.dao.CityManagerDAO;
 import in.bloomapp.exception.DBException;
 import in.bloomapp.exception.InvalidInputException;
@@ -24,8 +25,8 @@ public class CityManager {
 	public static void addCity(City city) throws ServiceException {
 		CityManagerDAO cityManagerDAO = new CityManagerDAO();
 		try {
-			BasicValidator.isValidString(city.getCity());
-			BasicValidator.isCharAllowed(city.getCity());
+			BasicValidator.isValidString(city.getCityName());
+			BasicValidator.isCharAllowed(city.getCityName());
 			CityValidator.validCityCode(city.getDistrictCode());
 			cityManagerDAO.save(city);
 		} catch (DBException | ValidCityException | InvalidInputException e) {
@@ -90,7 +91,7 @@ public class CityManager {
 		CityManagerDAO cityManagerDAO = new CityManagerDAO();
 		List<City> cities = cityManagerDAO.getCity();
 		for (City city : cities) {
-			if (deliveryCity.equalsIgnoreCase(city.getCity())) {
+			if (deliveryCity.equalsIgnoreCase(city.getCityName())) {
 				deliveryCharge = city.getDelivaryCharge();
 			}
 		}

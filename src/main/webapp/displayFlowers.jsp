@@ -61,6 +61,9 @@ String role = (String) session.getAttribute("ROLE");
 		</tbody>
 	</table>	
 	<script>
+		function getAllFlowers(){
+			
+		}
 		function myFunction() {
 			var input, filter, table, tr, td, i, txtValue;
 			input = document.getElementById("myInput");

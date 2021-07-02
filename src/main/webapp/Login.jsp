@@ -5,7 +5,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Login page</title>
-</head>
+</head>  
 <body>
 <jsp:include page="header.jsp"></jsp:include>
 	<main class="container-fluid">
