@@ -29,8 +29,7 @@ public class UserManager {
 	 * @throws UserValidationException
 	 * @throws ValidatorException
 	 */
-	public static boolean addUser(User user)
-			throws DBException, InvalidInputException, UserValidationException {
+	public static boolean addUser(User user) throws DBException, InvalidInputException, UserValidationException {
 		UserManagerDAO userManagerDAO = new UserManagerDAO();
 		boolean status = false;
 		// checks for blank spaces

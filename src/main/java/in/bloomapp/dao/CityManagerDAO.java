@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import in.bloomapp.exception.DBException;
 import in.bloomapp.model.City;
 import in.bloomapp.util.ConnectionUtil;
@@ -28,7 +29,7 @@ public class CityManagerDAO {
 			String sql = "insert into cities (district_code,city,delivary_charge,status) values ( ?,?,?,?)";
 			pst = connection.prepareStatement(sql);
 			pst.setInt(1, city.getDistrictCode());
-			pst.setString(2, city.getCity());
+			pst.setString(2, city.getCityName());
 			pst.setInt(3, city.getDelivaryCharge());
 			pst.setInt(4, city.getStatus());
 			// Executes the Query
@@ -55,7 +56,7 @@ public class CityManagerDAO {
 			String sql = "update cities set delivary_charge=? WHERE city=?";
 			pst = connection.prepareStatement(sql);
 			pst.setInt(1, city.getDelivaryCharge());
-			pst.setString(2, city.getCity());
+			pst.setString(2, city.getCityName());
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			throw new DBException("Unable to update city");
@@ -77,7 +78,7 @@ public class CityManagerDAO {
 			connection = ConnectionUtil.getConnection();
 			String sql = "update cities set status=0 WHERE city=?";
 			pst = connection.prepareStatement(sql);
-			pst.setString(1, city.getCity());
+			pst.setString(1, city.getCityName());
 			pst.executeUpdate();
 		} catch (SQLException e) {
 			throw new DBException("Unable to update city");
@@ -114,7 +115,7 @@ public class CityManagerDAO {
 				// Store the data in model
 				City subject = new City();
 				subject.setDistrictCode(districtCode);
-				subject.setCity(city);
+				subject.setCityName(city);
 				subject.setDelivaryCharge(delivaryCharge);
 				// Store all flowers in list
 				list.add(subject);

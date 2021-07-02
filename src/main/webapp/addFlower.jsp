@@ -5,6 +5,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Add flower to the table</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 </head>
 <body>
 <jsp:include page="header.jsp"></jsp:include>
@@ -44,14 +45,19 @@
 			let price=document.querySelector("#price").value;
 			const queryParameter="?category="+category+"&type="+type+"&price="+price;
 			let url="AddFlowerServlet"+queryParameter;
-			fetch(url,{ method:'POST'}).then(res => res.json()).then(res=>{		
-				if(res.IS_ADDED=="true"){				
-					alert("Successfully added");
-					window.location.href="displayFlowers.jsp";					
-				}	
-				else{
-					document.getElementById('testLabel').innerHTML = (res.IS_ADDED);
+			/* let data={"category":category,
+					"type":type,
+					"price":price}; */
+					let data={};
+			axios.post(url,data).then(res=> {
+				
+				let data = res.data;
+				alert(data.infoMessage);
+				window.location.href="displayFlowers.jsp";
 				}
+			).catch(err=>{
+				let data = err.response.data;
+				alert(data.errorMessage);
 			});
 		}
 		</script>
