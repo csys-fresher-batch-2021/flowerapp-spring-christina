@@ -50,7 +50,6 @@
 					"price":price}; */
 					let data={};
 			axios.post(url,data).then(res=> {
-				
 				let data = res.data;
 				alert(data.infoMessage);
 				window.location.href="displayFlowers.jsp";

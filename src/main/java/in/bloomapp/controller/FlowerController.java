@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,24 @@ public class FlowerController {
 			message.setInfoMessage("Successfiully added");
 			return new ResponseEntity<>(message, HttpStatus.OK);
 		} catch (ValidFlowerException | ServiceException | DBException e) {
+			message.setErrorMessage("Unable to add flower");
+			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/DeleteFlowerServlet")
+	public ResponseEntity<?> deleteFlower(HttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
+		String category = request.getParameter("category");
+		String type = request.getParameter("type");
+		System.out.println(category + type);
+		Message message = new Message();
+		try {
+			System.out.println("deleted");
+			FlowerManager.deleteFlower(category.trim(), type);
+			message.setInfoMessage("Successfiully deleted");
+			return new ResponseEntity<>(message, HttpStatus.OK);
+		} catch (ServiceException e) {
 			message.setErrorMessage("Unable to add flower");
 			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 		}

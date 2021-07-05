@@ -12,6 +12,7 @@ String role = (String)session.getAttribute("ROLE");
 <head>
 <meta charset="ISO-8859-1">
 <title>Flowers available</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 </head>
 <body>
 <jsp:include page="header.jsp"></jsp:include>
@@ -60,9 +61,11 @@ String role = (String)session.getAttribute("ROLE");
 					"</td><td id=getCategory>"+item.category+
 					"</td><td id=getType>"+item.type+
 					"</td><td>"+item.price;
+					let type=(item.type);
 					 if (role=="ADMIN"){
-						content+="</td ><td><a class=\"btn btn-danger\" href=\"DeleteFlowerServlet?category="+item.category+"&type="
-								+item.type+"\">Delete</a></td></tr>"; 
+						/* content+="</td ><td><a class=\"btn btn-danger\" href=\"DeleteFlowerServlet?category="+item.category+"&type="
+								+item.type+"\">Delete</a></td></tr>"; */
+						content+="</td><td><button class=\"btn btn-danger\" onclick=\"deleteFlower('"+item.type+"','"+item.category+"')\" >Delete</button></td></tr>";
 					 }
 					else{ 
 						content+="</td></tr>";	
@@ -73,7 +76,26 @@ String role = (String)session.getAttribute("ROLE");
 			document.querySelector("#flower-data").innerHTML= content;
 			});
 		}
-
+		
+		function deleteFlower(type,category){
+			event.preventDefault();
+			console.log("delete CS");
+			console.log(type);
+			console.log(category);
+			const queryParameter="?category="+category+"&type="+type;
+			let url="DeleteFlowerServlet"+queryParameter;
+			let data={};
+			axios.get(url,data).then(res=> {
+				let data = res.data;
+				alert(data.infoMessage);
+				window.location.href="displayFlowers.jsp";
+				}
+			).catch(err=>{
+				let data = err.response.data;
+				alert(data.errorMessage);
+				window.location.href="displayFlowers.jsp";
+			}); 
+		} 
 		function myFunction() {
 			var input, filter, table, tr, td, i, txtValue;
 			input = document.getElementById("myInput");
