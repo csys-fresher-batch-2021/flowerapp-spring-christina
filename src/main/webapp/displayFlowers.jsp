@@ -7,7 +7,7 @@
 <html lang="en">
 <%
 String loggedInUsername = (String)session.getAttribute("LOGGED_IN_USER");
-String role = (String) session.getAttribute("ROLE");
+String role = (String)session.getAttribute("ROLE");
 %>
 <head>
 <meta charset="ISO-8859-1">
@@ -37,40 +37,50 @@ String role = (String) session.getAttribute("ROLE");
 				<% } %>
 			</tr>
 		</thead>	
-			<tbody>
-		<%
-			final List<Flower> flowers = FlowerManager.getFLowerList();
-			int i=0;
-			for(Flower flower: flowers){
-				i++;
-			%>
-			<tr>
-			<td><%=i%></td>
-			<td><%=flower.getCategory() %></td>
-			<td><%=flower.getType()%></td>
-			<td>Rs.<%=flower.getPrice()%>/-</td>
-			 <% if (loggedInUsername != null && role != null && role.equalsIgnoreCase("ADMIN")){ %>
-			<td><a href="DeleteFlowerServlet?type=<%=flower.getType()%>&category=<%=flower.getCategory()%>"class="btn btn-danger">Delete</a></td>
-			 <%} %> 
-			 <% if (loggedInUsername != null && role != null && role.equalsIgnoreCase("USER")){ %>
-			<td><a href="CartServlet?type=<%=flower.getType()%>&category=<%=flower.getCategory()%>&price=<%=flower.getPrice()%>
-			&username=<%=loggedInUsername%>" class="btn btn-success">ADD TO CART</a></td>
-				<%}%>
-					<% } %>
-				</tr>	
+			<tbody id="flower-data">
+	
 		</tbody>
 	</table>	
 	<script>
 		function getAllFlowers(){
-			
+			//event.preventDefault();
+			console.log("Fetching flowers");
+			let role='<%=role%>';
+			let loggedInUsername='<%=loggedInUsername%>';
+			let url="DisplayFlowersServlet";
+			console.log(role);
+			fetch(url).then(res=> res.json()).then(res=>{
+				let flowers=res;
+				console.log(flowers);
+				console.log("replied");
+				let content="";
+				let serial=1;
+				for(let item of flowers){
+					content += "<tr><td>"+serial+
+					"</td><td id=getCategory>"+item.category+
+					"</td><td id=getType>"+item.type+
+					"</td><td>"+item.price;
+					 if (role=="ADMIN"){
+						content+="</td ><td><a class=\"btn btn-danger\" href=\"DeleteFlowerServlet?category="+item.category+"&type="
+								+item.type+"\">Delete</a></td></tr>"; 
+					 }
+					else{ 
+						content+="</td></tr>";	
+					} 
+					serial++;
+				}
+			console.log(content);
+			document.querySelector("#flower-data").innerHTML= content;
+			});
 		}
+
 		function myFunction() {
 			var input, filter, table, tr, td, i, txtValue;
 			input = document.getElementById("myInput");
 			filter = input.value.toUpperCase();
 			table = document.getElementById("myTable");
 			tr = table.getElementsByTagName("tr");
-			for (i = 0; i < tr.length; i++) {
+			for (i = 0; i < tr.length; i++){
 				td = tr[i].getElementsByTagName("td")[1];
 				if (td) {
 					txtValue = td.textContent || td.innerText;
@@ -101,6 +111,7 @@ String role = (String) session.getAttribute("ROLE");
 				}
 			}
 		}
+		getAllFlowers();
 	</script> 
 	 <% if (loggedInUsername != null && role != null && role.equalsIgnoreCase("ADMIN")){ %>
 		<a href="addFlower.jsp">Add flowers</a>

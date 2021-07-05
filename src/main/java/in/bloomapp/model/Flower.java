@@ -19,4 +19,9 @@ public class Flower {
 	private String buyer;
 	private LocalDate date;
 
+	@Override
+	public String toString() {
+		return "Flower [category=" + category + ", type=" + type + ", price=" + price + "]";
+	}
+
 }
