@@ -18,6 +18,8 @@ String role = (String)session.getAttribute("ROLE");
 <jsp:include page="header.jsp"></jsp:include>
 	<main class="container-fluid">
 		<h1 style="color:pink">Flowers available</h1>
+		<p id ="infoMessage" style="color:green" ></p>
+		<p id ="errorMessage" style="color:red" ></p>
 		<input type="text" id="myInput" onkeyup="myFunction()"
 			placeholder="Search By Category">
 		<input type="text" id="flowerInput" onkeyup="myFlowerType()"
@@ -39,21 +41,15 @@ String role = (String)session.getAttribute("ROLE");
 			</tr>
 		</thead>	
 			<tbody id="flower-data">
-	
 		</tbody>
 	</table>	
 	<script>
 		function getAllFlowers(){
-			//event.preventDefault();
-			console.log("Fetching flowers");
 			let role='<%=role%>';
 			let loggedInUsername='<%=loggedInUsername%>';
 			let url="DisplayFlowersServlet";
-			console.log(role);
 			fetch(url).then(res=> res.json()).then(res=>{
 				let flowers=res;
-				console.log(flowers);
-				console.log("replied");
 				let content="";
 				let serial=1;
 				for(let item of flowers){
@@ -63,9 +59,12 @@ String role = (String)session.getAttribute("ROLE");
 					"</td><td>"+item.price;
 					let type=(item.type);
 					 if (role=="ADMIN"){
-						/* content+="</td ><td><a class=\"btn btn-danger\" href=\"DeleteFlowerServlet?category="+item.category+"&type="
-								+item.type+"\">Delete</a></td></tr>"; */
-						content+="</td><td><button class=\"btn btn-danger\" onclick=\"deleteFlower('"+item.type+"','"+item.category+"')\" >Delete</button></td></tr>";
+						content+="</td><td><button class=\"btn btn-danger\" onclick=\"deleteFlower('"+item.type+"','"
+								+item.category+"')\" >Delete</button></td></tr>";
+					 }
+					 else if(loggedInUsername != null && role != null && role=="USER"){
+						 content+="</td><td><button class=\"btn btn-success\" onclick=\"addToCart('"+item.type+"','"
+							+item.category+"','"+item.price+"')\" >CART</button></td></tr>";
 					 }
 					else{ 
 						content+="</td></tr>";	
@@ -79,9 +78,6 @@ String role = (String)session.getAttribute("ROLE");
 		
 		function deleteFlower(type,category){
 			event.preventDefault();
-			console.log("delete CS");
-			console.log(type);
-			console.log(category);
 			const queryParameter="?category="+category+"&type="+type;
 			let url="DeleteFlowerServlet"+queryParameter;
 			let data={};
@@ -96,6 +92,24 @@ String role = (String)session.getAttribute("ROLE");
 				window.location.href="displayFlowers.jsp";
 			}); 
 		} 
+
+		function addToCart(type,category,price){
+			event.preventDefault();
+			let loggedInUsername='<%=loggedInUsername%>';
+			const queryParameter="?category="+category+"&type="+type+"&price="+price+"&loggedInUsername="+loggedInUsername;
+			let url="AddToCart"+queryParameter;
+			let data={};
+			axios.get(url,data).then(res=> {
+				let data= res.data;
+				document.querySelector("#infoMessage").innerHTML= data.infoMessage;
+				}
+			).catch(err=>{
+				let data = err.response.data;
+				document.querySelector("#errorMessage").innerHTML= data.errorMessage;
+				window.location.href="displayFlowers.jsp";
+			}); 
+		}
+		
 		function myFunction() {
 			var input, filter, table, tr, td, i, txtValue;
 			input = document.getElementById("myInput");

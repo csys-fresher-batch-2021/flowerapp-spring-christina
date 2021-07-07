@@ -23,23 +23,31 @@
 				<th scope="col"id="Charge">Delivery Charge</th>				
 			</tr>
 		</thead>	
-			<tbody>
-		<%
-		    final List<City> cities = CityManager.getCity();
-			int i=0;
-			for(City city: cities){
-				i++;
-			%>
-			<tr>
-			<th  scope="col"><%=i%></th>
-			<td><%=city.getDistrictCode() %></td>
-			<td><%=city.getCity()%></td>
-			<td>Rs.<%=city.getDelivaryCharge()%>/-</td>
-		    </tr>
-		      <%} %>
-		    </tbody>
+			<tbody id="cityTable">
+			</tbody>
 		    </table>
-		    <a href="displayFlowers.jsp">Flowers</a>
+	<script>
+		function getCities(){
+			let url="DisplayCitiesServlet";
+			fetch(url).then(res=> res.json()).then(res=>{
+				let cities=res;
+				console.log(cities);
+				console.log("replied");
+				let content="";
+				let serial=1;
+				for(let city of cities){
+					content += "<tr><td>"+serial+
+					"</td><td>"+city.districtCode+
+					"</td><td>"+city.cityName+
+					"</td><td>"+city.delivaryCharge;
+					serial++;
+				}
+			console.log(content);
+			document.querySelector("#cityTable").innerHTML= content;
+			});
+		}
+		getCities();
+	</script>
 </main>
 </body>
 </html>

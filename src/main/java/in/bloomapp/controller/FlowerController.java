@@ -18,6 +18,7 @@ import in.bloomapp.exception.DBException;
 import in.bloomapp.exception.ServiceException;
 import in.bloomapp.exception.ValidFlowerException;
 import in.bloomapp.model.Flower;
+import in.bloomapp.service.CartManager;
 import in.bloomapp.service.FlowerManager;
 
 @RestController
@@ -75,7 +76,31 @@ public class FlowerController {
 			message.setInfoMessage("Successfiully deleted");
 			return new ResponseEntity<>(message, HttpStatus.OK);
 		} catch (ServiceException e) {
-			message.setErrorMessage("Unable to add flower");
+			message.setErrorMessage("Unable to delete flower");
+			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/AddToCart")
+	public ResponseEntity<?> addToCart(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Message message = new Message();
+		try {
+			String category = request.getParameter("category");
+			String type = request.getParameter("type");
+			String price = request.getParameter("price");
+			String userName = request.getParameter("loggedInUsername");
+			int parsedPrice = Integer.parseInt(price);
+			Flower newOrder = new Flower();
+			newOrder.setCategory(category);
+			newOrder.setType(type);
+			newOrder.setPrice(parsedPrice);
+			newOrder.setQuantity(1);
+			newOrder.setBuyer(userName);
+			CartManager.addToCart(newOrder);
+			message.setInfoMessage("Successfiully added to cart");
+			return new ResponseEntity<>(message, HttpStatus.OK);
+		} catch (DBException e) {
+			message.setErrorMessage("Unable to add flower to cart");
 			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 		}
 	}
