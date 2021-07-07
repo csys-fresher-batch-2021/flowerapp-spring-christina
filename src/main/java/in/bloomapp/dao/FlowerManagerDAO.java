@@ -26,7 +26,7 @@ public class FlowerManagerDAO {
 		try {
 			connection = ConnectionUtil.getConnection();
 			// Prepare data to insert into the driver
-			String sql = "insert into flowersData (name,category,price) values ( ?,?,?)";
+			String sql = "insert into flowersData (name,category,price,status) values ( ?,?,?,1)";
 			pst = connection.prepareStatement(sql);
 			pst.setString(1, newFlower.getType());
 			pst.setString(2, newFlower.getCategory());
@@ -53,13 +53,16 @@ public class FlowerManagerDAO {
 		PreparedStatement pst = null;
 		try {
 			connection = ConnectionUtil.getConnection();
+
 			// Preparing the data
-			String sql = "DELETE FROM flowersData WHERE name= ?;";
+			String sql = "update flowersdata set status=0 where name=?;";
+
 			pst = connection.prepareStatement(sql);
 			pst.setString(1, oldFlower.getType());
 			// Executes the Query
+			System.out.println(oldFlower.getType());
 			pst.executeUpdate();
-
+			System.out.println("sql delete");
 		} catch (SQLException e) {
 			// If cannot add flower shows exception
 			throw new DBException("Unable to delete flower");
@@ -86,7 +89,7 @@ public class FlowerManagerDAO {
 			// Step 1: Get the connection
 			con = ConnectionUtil.getConnection();
 			// Step 2: Query
-			String sql = "select category,name,price from flowersData";
+			String sql = "select category,name,price from flowersData where status=1";
 			pst = con.prepareStatement(sql);
 			// Step 3: execute query
 			rs = pst.executeQuery();

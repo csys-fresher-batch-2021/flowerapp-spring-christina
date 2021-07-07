@@ -1,10 +1,14 @@
 package in.bloomapp.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,10 +18,24 @@ import in.bloomapp.exception.DBException;
 import in.bloomapp.exception.ServiceException;
 import in.bloomapp.exception.ValidFlowerException;
 import in.bloomapp.model.Flower;
+import in.bloomapp.service.CartManager;
 import in.bloomapp.service.FlowerManager;
 
 @RestController
+@Controller
 public class FlowerController {
+
+	@GetMapping("/DisplayFlowersServlet")
+	public List<Flower> getAllFlowers() {
+		List<Flower> flowers = null;
+		try {
+			flowers = FlowerManager.getFLowerList();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		}
+		System.out.println(flowers);
+		return flowers;
+	}
 
 	@PostMapping("/AddFlowerServlet")
 	public ResponseEntity<?> addFlower(HttpServletRequest request, HttpServletResponse response) {
@@ -46,16 +64,43 @@ public class FlowerController {
 	}
 
 	@GetMapping("/DeleteFlowerServlet")
-	public ResponseEntity<?> deleteFlower(HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<?> deleteFlower(HttpServletRequest request, HttpServletResponse response,
+			HttpSession session) {
 		String category = request.getParameter("category");
 		String type = request.getParameter("type");
+		System.out.println(category + type);
 		Message message = new Message();
 		try {
-			FlowerManager.deleteFlower(category, type);
-			message.setInfoMessage("Successfiully added");
+			System.out.println("deleted");
+			FlowerManager.deleteFlower(category.trim(), type);
+			message.setInfoMessage("Successfiully deleted");
 			return new ResponseEntity<>(message, HttpStatus.OK);
 		} catch (ServiceException e) {
-			message.setErrorMessage("Unable to add flower");
+			message.setErrorMessage("Unable to delete flower");
+			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/AddToCart")
+	public ResponseEntity<?> addToCart(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+		Message message = new Message();
+		try {
+			String category = request.getParameter("category");
+			String type = request.getParameter("type");
+			String price = request.getParameter("price");
+			String userName = request.getParameter("loggedInUsername");
+			int parsedPrice = Integer.parseInt(price);
+			Flower newOrder = new Flower();
+			newOrder.setCategory(category);
+			newOrder.setType(type);
+			newOrder.setPrice(parsedPrice);
+			newOrder.setQuantity(1);
+			newOrder.setBuyer(userName);
+			CartManager.addToCart(newOrder);
+			message.setInfoMessage("Successfiully added to cart");
+			return new ResponseEntity<>(message, HttpStatus.OK);
+		} catch (DBException e) {
+			message.setErrorMessage("Unable to add flower to cart");
 			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 		}
 	}

@@ -71,7 +71,7 @@ String role = (String) session.getAttribute("ROLE");
 			<%
 			final List<City> cityName = CityManager.getCity();
 			for (City cities : cityName) {%>
-			<option><%=cities.getCity()%></option>
+			<option><%=cities.getCityName()%></option>
 			<% }%>
 		</select> <br />
 		<%} else {%>

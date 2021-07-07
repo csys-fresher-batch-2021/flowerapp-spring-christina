@@ -7,16 +7,19 @@
 <html lang="en">
 <%
 String loggedInUsername = (String)session.getAttribute("LOGGED_IN_USER");
-String role = (String) session.getAttribute("ROLE");
+String role = (String)session.getAttribute("ROLE");
 %>
 <head>
 <meta charset="ISO-8859-1">
 <title>Flowers available</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
 </head>
 <body>
 <jsp:include page="header.jsp"></jsp:include>
 	<main class="container-fluid">
 		<h1 style="color:pink">Flowers available</h1>
+		<p id ="infoMessage" style="color:green" ></p>
+		<p id ="errorMessage" style="color:red" ></p>
 		<input type="text" id="myInput" onkeyup="myFunction()"
 			placeholder="Search By Category">
 		<input type="text" id="flowerInput" onkeyup="myFlowerType()"
@@ -37,40 +40,83 @@ String role = (String) session.getAttribute("ROLE");
 				<% } %>
 			</tr>
 		</thead>	
-			<tbody>
-		<%
-			final List<Flower> flowers = FlowerManager.getFLowerList();
-			int i=0;
-			for(Flower flower: flowers){
-				i++;
-			%>
-			<tr>
-			<td><%=i%></td>
-			<td><%=flower.getCategory() %></td>
-			<td><%=flower.getType()%></td>
-			<td>Rs.<%=flower.getPrice()%>/-</td>
-			 <% if (loggedInUsername != null && role != null && role.equalsIgnoreCase("ADMIN")){ %>
-			<td><a href="DeleteFlowerServlet?type=<%=flower.getType()%>&category=<%=flower.getCategory()%>"class="btn btn-danger">Delete</a></td>
-			 <%} %> 
-			 <% if (loggedInUsername != null && role != null && role.equalsIgnoreCase("USER")){ %>
-			<td><a href="CartServlet?type=<%=flower.getType()%>&category=<%=flower.getCategory()%>&price=<%=flower.getPrice()%>
-			&username=<%=loggedInUsername%>" class="btn btn-success">ADD TO CART</a></td>
-				<%}%>
-					<% } %>
-				</tr>	
+			<tbody id="flower-data">
 		</tbody>
 	</table>	
 	<script>
 		function getAllFlowers(){
-			
+			let role='<%=role%>';
+			let loggedInUsername='<%=loggedInUsername%>';
+			let url="DisplayFlowersServlet";
+			fetch(url).then(res=> res.json()).then(res=>{
+				let flowers=res;
+				let content="";
+				let serial=1;
+				for(let item of flowers){
+					content += "<tr><td>"+serial+
+					"</td><td id=getCategory>"+item.category+
+					"</td><td id=getType>"+item.type+
+					"</td><td>"+item.price;
+					let type=(item.type);
+					 if (role=="ADMIN"){
+						content+="</td><td><button class=\"btn btn-danger\" onclick=\"deleteFlower('"+item.type+"','"
+								+item.category+"')\" >Delete</button></td></tr>";
+					 }
+					 else if(loggedInUsername != null && role != null && role=="USER"){
+						 content+="</td><td><button class=\"btn btn-success\" onclick=\"addToCart('"+item.type+"','"
+							+item.category+"','"+item.price+"')\" >CART</button></td></tr>";
+					 }
+					else{ 
+						content+="</td></tr>";	
+					} 
+					serial++;
+				}
+			console.log(content);
+			document.querySelector("#flower-data").innerHTML= content;
+			});
 		}
+		
+		function deleteFlower(type,category){
+			event.preventDefault();
+			const queryParameter="?category="+category+"&type="+type;
+			let url="DeleteFlowerServlet"+queryParameter;
+			let data={};
+			axios.get(url,data).then(res=> {
+				let data = res.data;
+				alert(data.infoMessage);
+				window.location.href="displayFlowers.jsp";
+				}
+			).catch(err=>{
+				let data = err.response.data;
+				alert(data.errorMessage);
+				window.location.href="displayFlowers.jsp";
+			}); 
+		} 
+
+		function addToCart(type,category,price){
+			event.preventDefault();
+			let loggedInUsername='<%=loggedInUsername%>';
+			const queryParameter="?category="+category+"&type="+type+"&price="+price+"&loggedInUsername="+loggedInUsername;
+			let url="AddToCart"+queryParameter;
+			let data={};
+			axios.get(url,data).then(res=> {
+				let data= res.data;
+				document.querySelector("#infoMessage").innerHTML= data.infoMessage;
+				}
+			).catch(err=>{
+				let data = err.response.data;
+				document.querySelector("#errorMessage").innerHTML= data.errorMessage;
+				window.location.href="displayFlowers.jsp";
+			}); 
+		}
+		
 		function myFunction() {
 			var input, filter, table, tr, td, i, txtValue;
 			input = document.getElementById("myInput");
 			filter = input.value.toUpperCase();
 			table = document.getElementById("myTable");
 			tr = table.getElementsByTagName("tr");
-			for (i = 0; i < tr.length; i++) {
+			for (i = 0; i < tr.length; i++){
 				td = tr[i].getElementsByTagName("td")[1];
 				if (td) {
 					txtValue = td.textContent || td.innerText;
@@ -101,6 +147,7 @@ String role = (String) session.getAttribute("ROLE");
 				}
 			}
 		}
+		getAllFlowers();
 	</script> 
 	 <% if (loggedInUsername != null && role != null && role.equalsIgnoreCase("ADMIN")){ %>
 		<a href="addFlower.jsp">Add flowers</a>

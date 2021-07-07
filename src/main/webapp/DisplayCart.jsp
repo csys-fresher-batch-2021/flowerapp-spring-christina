@@ -57,6 +57,11 @@ String role = (String) session.getAttribute("ROLE");
 		 		 <a href="OrderProcedure.jsp" class="btn btn-warning">Place Order</a><br/><br/>
 		 		 <%} %>
 		 		 <a href="displayFlowers.jsp" class="btn btn-success">Flowers</a>
-		 		<%}%>	 		 
+		 		<%}%>	 	
+	<script>
+	function getCity(){
+		
+	}
+	</script>	 
 </main>
 </body>

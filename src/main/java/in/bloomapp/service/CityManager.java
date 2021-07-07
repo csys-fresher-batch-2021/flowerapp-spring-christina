@@ -68,14 +68,15 @@ public class CityManager {
 	 * Gets the available cities from the data base
 	 * 
 	 * @return
+	 * @throws ServiceException
 	 */
-	public static List<City> getCity() {
+	public static List<City> getCity() throws ServiceException {
 		CityManagerDAO cityManagerDAO = new CityManagerDAO();
 		List<City> cities = null;
 		try {
 			cities = cityManagerDAO.getCity();
 		} catch (DBException e) {
-			e.printStackTrace();
+			throw new ServiceException("Data server low");
 		}
 		return cities;
 	}

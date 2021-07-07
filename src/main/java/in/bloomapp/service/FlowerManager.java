@@ -2,6 +2,7 @@ package in.bloomapp.service;
 
 import java.sql.SQLException;
 import java.util.List;
+
 import in.bloomapp.dao.FlowerManagerDAO;
 import in.bloomapp.exception.DBException;
 import in.bloomapp.exception.InvalidInputException;
@@ -13,8 +14,9 @@ import in.bloomapp.validator.Validator;
 
 public class FlowerManager {
 	private FlowerManager() {
-		
+
 	}
+
 	/**
 	 * checks for the input category and appends the flower type in that category
 	 * 
@@ -27,7 +29,7 @@ public class FlowerManager {
 	 */
 	public static boolean addFlower(String category, String type, int price)
 			throws ValidFlowerException, ServiceException, DBException {
-		FlowerManagerDAO flowerManagerDAO1=new FlowerManagerDAO();
+		FlowerManagerDAO flowerManagerDAO1 = new FlowerManagerDAO();
 		boolean status = false;
 		// checks for blank spaces
 		try {
@@ -46,7 +48,7 @@ public class FlowerManager {
 			throw new ServiceException(e, e.getMessage());
 		} catch (ValidFlowerException e) {
 			throw new ServiceException(e.getMessage());
-		} catch (DBException|SQLException e) {
+		} catch (DBException | SQLException e) {
 			throw new DBException(e.getMessage());
 		}
 	}
@@ -57,38 +59,38 @@ public class FlowerManager {
 	 * @param category
 	 * @param type
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 * @throws ValidFlowerException
 	 * @throws taskImpossibleException
 	 */
-	public static boolean deleteFlower(String category, String type) throws ServiceException{
+	public static void deleteFlower(String category, String type) throws ServiceException {
 		// Checks for the category ,if deleted gives the success message and returns
 		// true
-		FlowerManagerDAO flowerManagerDAO=new FlowerManagerDAO();
+		FlowerManagerDAO flowerManagerDAO = new FlowerManagerDAO();
 		try {
 			Flower oldFlower = Validator.flowerIsExist(category, type);
 			flowerManagerDAO.removeFlower(oldFlower);
-			return true;
-		} 
-		catch (ValidFlowerException e) {
+
+		} catch (ValidFlowerException e) {
 			throw new ServiceException("Can't delete");
-		}
-		catch (DBException|SQLException e) {
-			return false;
+		} catch (DBException | SQLException e) {
+			throw new ServiceException("Data server low");
 		}
 	}
 
 	/**
 	 * gets the list of flowers from database
+	 * 
 	 * @return
+	 * @throws ServiceException
 	 */
-	public static List<Flower> getFLowerList() {
-		FlowerManagerDAO flowerManagerDAO=new FlowerManagerDAO();
-		List<Flower> flowers=null;
+	public static List<Flower> getFLowerList() throws ServiceException {
+		FlowerManagerDAO flowerManagerDAO = new FlowerManagerDAO();
+		List<Flower> flowers = null;
 		try {
 			flowers = flowerManagerDAO.getFlower();
 		} catch (DBException e) {
-			e.printStackTrace();		
+			throw new ServiceException(e.getMessage());
 		}
 		return flowers;
 	}
